@@ -1,0 +1,38 @@
+#########################################################################################################################
+#                                            Coded from Ruben with Love!                                                #
+#########################################################################################################################
+prefix: "&e&lLobby&6&lEngine &8» &7"
+
+messages:
+  buildprot:
+    feedback: true
+    place: "&7You &ccannot&7 place blocks here!"
+    break: "&7You &ccannot&7 break blocks here!"
+  entityspawn:
+    enabled: "&eEntity &7spawning has been &aenabled&7!"
+    disabled: "&eEntity &7spawning has been &cdisabled&7!"
+  spawn:
+    teleported: "&aSuccessfully&7 teleported to &espawn&7!"
+    notset: "&cNo&7 spawn location set!"
+    error: "&7An &cError&7 occurred while teleporting!"
+    set: "&7The &eSpawn &7location has &asuccessfully&7 been set!"
+
+entityspawn:
+  blocked: true
+blockdecay:
+  blocked: true
+spawn:
+  teleport-on-join: true
+  sounds:
+    teleport: "ENTITY_ENDERMAN_TELEPORT"
+    levelup: "ENTITY_PLAYER_LEVELUP"
+    beacon: "BLOCK_BEACON_ACTIVATE"
+    confirm: "BLOCK_NOTE_BLOCK_PLING"
+    volume1: 1.0
+    volume2: 0.7
+    volume3: 0.5
+    confirm-volume: 1.0
+    pitch1: 1.0
+    pitch2: 1.5
+    pitch3: 2.0
+    confirm-pitch: 2.0
