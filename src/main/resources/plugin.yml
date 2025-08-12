@@ -1,0 +1,4 @@
+name: LobbyEngine
+version: '1.0-ALPHA'
+main: net.Ruben54213.lobbyEngine.LobbyEngine
+api-version: '1.18'
