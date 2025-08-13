@@ -89,6 +89,15 @@ public class LobbyCommand implements CommandExecutor, TabCompleter {
                 ));
                 return true;
             }
+
+            // Prüfen ob Slot an den Rändern ist (nicht erlaubt)
+            if (!isValidServerSlot(slot)) {
+                sender.sendMessage(translateColorCodes(
+                        plugin.getConfig().getString("prefix", "") +
+                                "&cSlot &b" + slot + "&c is a border slot! Use slots 10-16, 19-25, 28-34 only!"
+                ));
+                return true;
+            }
         } catch (NumberFormatException e) {
             sender.sendMessage(translateColorCodes(
                     plugin.getConfig().getString("prefix", "") +
@@ -270,8 +279,12 @@ public class LobbyCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 3 && args[0].equalsIgnoreCase("create")) {
             List<String> slots = new ArrayList<>();
-            for (int i = 0; i < 45; i++) {
-                slots.add(String.valueOf(i));
+            // Nur gültige Server-Slots vorschlagen (10-16, 19-25, 28-34)
+            for (int row = 1; row < 4; row++) {
+                for (int col = 1; col < 8; col++) {
+                    int slot = row * 9 + col;
+                    slots.add(String.valueOf(slot));
+                }
             }
             return slots.stream()
                     .filter(s -> s.startsWith(args[2]))
@@ -287,6 +300,22 @@ public class LobbyCommand implements CommandExecutor, TabCompleter {
         }
 
         return new ArrayList<>();
+    }
+
+    /**
+     * Prüft ob ein Slot für Server-Items erlaubt ist (nicht an den Rändern)
+     */
+    private boolean isValidServerSlot(int slot) {
+        if (slot < 0 || slot >= 45) return false;
+
+        // Erste und letzte Zeile sind Ränder
+        if (slot < 9 || slot >= 36) return false;
+
+        // Linke und rechte Ränder
+        int column = slot % 9;
+        if (column == 0 || column == 8) return false;
+
+        return true;
     }
 
     /**

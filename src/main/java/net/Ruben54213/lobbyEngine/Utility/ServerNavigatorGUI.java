@@ -53,9 +53,12 @@ public class ServerNavigatorGUI implements Listener {
         }
     }
 
+    /**
+     * Öffnet das Navigator-GUI für einen Spieler
+     */
     public void openNavigator(Player player) {
         // GUI erstellen (5 Zeilen = 45 Slots)
-        Inventory gui = Bukkit.createInventory(null, 45, translateColorCodes(plugin.getConfig().getString("shortprefix", "") + "&7Select a &eServer"));
+        Inventory gui = Bukkit.createInventory(null, 45, translateColorCodes("&d&lServer Navigator"));
 
         // Server-Items hinzufügen
         for (Map.Entry<Integer, String> entry : serverSlots.entrySet()) {
@@ -136,7 +139,7 @@ public class ServerNavigatorGUI implements Listener {
         Player player = (Player) event.getWhoClicked();
 
         // Prüfen ob es das Navigator-GUI ist
-        if (!event.getView().getTitle().equals(translateColorCodes("&d&lServer Navigator"))) {
+        if (!event.getView().getTitle().equals(translateColorCodes(plugin.getConfig().getString("shortprefix", "") + "&7Select a &eServer"))) {
             return;
         }
 
