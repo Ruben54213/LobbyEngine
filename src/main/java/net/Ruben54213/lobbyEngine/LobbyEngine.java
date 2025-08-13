@@ -1,19 +1,25 @@
 package net.Ruben54213.lobbyEngine;
 
 import net.Ruben54213.lobbyEngine.Commands.EntitySpawnCommand;
+import net.Ruben54213.lobbyEngine.Commands.LobbyCommand;
 import net.Ruben54213.lobbyEngine.Commands.SetSpawnCommand;
 import net.Ruben54213.lobbyEngine.Commands.SpawnCommand;
 import net.Ruben54213.lobbyEngine.Listeners.BlockDecayListener;
 import net.Ruben54213.lobbyEngine.Listeners.BuildProtListener;
 import net.Ruben54213.lobbyEngine.Listeners.EntitySpawnListener;
 import net.Ruben54213.lobbyEngine.Listeners.InventoryProtListener;
+import net.Ruben54213.lobbyEngine.Listeners.NavigatorListener;
 import net.Ruben54213.lobbyEngine.Listeners.PlayerJoinListener;
+import net.Ruben54213.lobbyEngine.Utility.CompassManager;
+import net.Ruben54213.lobbyEngine.Utility.ServerNavigatorGUI;
 import net.Ruben54213.lobbyEngine.Utility.SpawnManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class LobbyEngine extends JavaPlugin {
 
     private SpawnManager spawnManager;
+    private CompassManager compassManager;
+    private ServerNavigatorGUI navigatorGUI;
 
     @Override
     public void onEnable() {
@@ -22,8 +28,17 @@ public final class LobbyEngine extends JavaPlugin {
         // Config laden/erstellen
         saveDefaultConfig();
 
+        // Config neu laden um sicherzustellen dass alle Werte geladen sind
+        reloadConfig();
+
         // SpawnManager initialisieren
         spawnManager = new SpawnManager(this);
+
+        // CompassManager initialisieren
+        compassManager = new CompassManager(this);
+
+        // ServerNavigatorGUI initialisieren
+        navigatorGUI = new ServerNavigatorGUI(this);
 
         // Listener registrieren
         registerListeners();
@@ -62,8 +77,15 @@ public final class LobbyEngine extends JavaPlugin {
         blockDecayListener.register();
 
         // Player-Join Listener
-        PlayerJoinListener playerJoinListener = new PlayerJoinListener(this, spawnManager);
+        PlayerJoinListener playerJoinListener = new PlayerJoinListener(this, spawnManager, compassManager);
         playerJoinListener.register();
+
+        // Navigator Listener
+        NavigatorListener navigatorListener = new NavigatorListener(this, compassManager, navigatorGUI);
+        navigatorListener.register();
+
+        // Navigator GUI Listener registrieren
+        navigatorGUI.register();
 
         getLogger().info("All listeners have been registered!");
     }
@@ -73,17 +95,38 @@ public final class LobbyEngine extends JavaPlugin {
      */
     private void registerCommands() {
         // Entity-Spawn Command
-        EntitySpawnListener entitySpawnListener = new EntitySpawnListener(this);
-        EntitySpawnCommand entitySpawnCommand = new EntitySpawnCommand(this, entitySpawnListener);
-        getCommand("entityspawn").setExecutor(entitySpawnCommand);
+        if (getCommand("entityspawn") != null) {
+            EntitySpawnListener entitySpawnListener = new EntitySpawnListener(this);
+            EntitySpawnCommand entitySpawnCommand = new EntitySpawnCommand(this, entitySpawnListener);
+            getCommand("entityspawn").setExecutor(entitySpawnCommand);
+        } else {
+            getLogger().warning("Command 'entityspawn' not found in plugin.yml!");
+        }
 
         // Spawn Commands
-        SpawnCommand spawnCommand = new SpawnCommand(this, spawnManager);
-        getCommand("spawn").setExecutor(spawnCommand);
+        if (getCommand("spawn") != null) {
+            SpawnCommand spawnCommand = new SpawnCommand(this, spawnManager);
+            getCommand("spawn").setExecutor(spawnCommand);
+        } else {
+            getLogger().warning("Command 'spawn' not found in plugin.yml!");
+        }
 
-        SetSpawnCommand setSpawnCommand = new SetSpawnCommand(this, spawnManager);
-        getCommand("setspawn").setExecutor(setSpawnCommand);
+        if (getCommand("setspawn") != null) {
+            SetSpawnCommand setSpawnCommand = new SetSpawnCommand(this, spawnManager);
+            getCommand("setspawn").setExecutor(setSpawnCommand);
+        } else {
+            getLogger().warning("Command 'setspawn' not found in plugin.yml!");
+        }
 
-        getLogger().info("All commands have been registered!");
+        // Lobby Command
+        if (getCommand("lobby") != null) {
+            LobbyCommand lobbyCommand = new LobbyCommand(this, navigatorGUI);
+            getCommand("lobby").setExecutor(lobbyCommand);
+            getCommand("lobby").setTabCompleter(lobbyCommand);
+        } else {
+            getLogger().warning("Command 'lobby' not found in plugin.yml!");
+        }
+
+        getLogger().info("Commands have been registered!");
     }
 }

@@ -2,6 +2,7 @@
 #                                            Coded from Ruben with Love!                                                #
 #########################################################################################################################
 prefix: "&e&lLobby&6&lEngine &8» &7"
+shortprefix: "&e&lL&6&lE &8» &7"
 
 messages:
   buildprot:
@@ -16,6 +17,26 @@ messages:
     notset: "&cNo&7 spawn location set!"
     error: "&7An &cError&7 occurred while teleporting!"
     set: "&7The &eSpawn &7location has &asuccessfully&7 been set!"
+  welcome:
+    enabled: true
+    messages:
+      - ""
+      - "&e&l◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆"
+      - "&f                      Welcome to our Server!"
+      - ""
+      - "&f                        Hello &e%player%&f!"
+      - "&f                   We hope you enjoy your stay!"
+      - ""
+      - "&f                    Online Players: &a%online%&7/&c%max%"
+      - "&f                 Website: &ewww.yourwebsite.net"
+      - ""
+      - "&e&l◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆"
+  navigator:
+    connecting: "&7You will &enow&7 be connected to &a%server%&7..."
+    slot-occupied: "&7Slot &e%slot%&7 is &calready&7 occupied!"
+    slot-empty: "&7Slot &e%slot%&7 is &cempty&7!"
+    created: "&7Server &e%server%&7 created in slot &e%slot%&7!"
+    removed: "&7Server &cremoved&7 from slot &e%slot%&7!"
 
 entityspawn:
   blocked: true
@@ -36,3 +57,9 @@ spawn:
     pitch2: 1.5
     pitch3: 2.0
     confirm-pitch: 2.0
+navigator:
+  sounds:
+    open: "UI_BUTTON_CLICK"
+    volume: 1.0
+    pitch: 1.0
+  servers:
