@@ -1,6 +1,7 @@
 package net.Ruben54213.lobbyEngine.Listeners;
 
 import net.Ruben54213.lobbyEngine.Utility.CompassManager;
+import net.Ruben54213.lobbyEngine.Utility.CosmeticsManager;
 import net.Ruben54213.lobbyEngine.Utility.SpawnManager;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -21,11 +22,13 @@ public class PlayerJoinListener implements Listener {
     private final JavaPlugin plugin;
     private final SpawnManager spawnManager;
     private final CompassManager compassManager;
+    private final CosmeticsManager cosmeticsManager;
 
-    public PlayerJoinListener(JavaPlugin plugin, SpawnManager spawnManager, CompassManager compassManager) {
+    public PlayerJoinListener(JavaPlugin plugin, SpawnManager spawnManager, CompassManager compassManager, CosmeticsManager cosmeticsManager) {
         this.plugin = plugin;
         this.spawnManager = spawnManager;
         this.compassManager = compassManager;
+        this.cosmeticsManager = cosmeticsManager;
     }
 
     /**
@@ -38,8 +41,8 @@ public class PlayerJoinListener implements Listener {
         // WICHTIG: Debug-Nachricht um zu sehen ob Event überhaupt ausgelöst wird
         plugin.getLogger().info("PlayerJoinEvent triggered for: " + player.getName());
 
-        // Navigator-Kompass geben
-        giveNavigatorCompass(player);
+        // Navigator-Kompass und Cosmetics-Item geben
+        giveLobbyItems(player);
 
         // Willkommensnachricht senden
         sendWelcomeMessage(player);
@@ -84,14 +87,20 @@ public class PlayerJoinListener implements Listener {
     }
 
     /**
-     * Gibt dem Spieler den Navigator-Kompass
+     * Gibt dem Spieler alle Lobby-Items (Navigator + Cosmetics)
      */
-    private void giveNavigatorCompass(Player player) {
+    private void giveLobbyItems(Player player) {
         // Verzögerung damit Inventar richtig geladen ist
         new BukkitRunnable() {
             @Override
             public void run() {
+                // Navigator-Kompass (Slot 0)
                 compassManager.giveNavigatorCompass(player);
+                plugin.getLogger().info("Navigator compass given to " + player.getName());
+
+                // Cosmetics-Item (Slot 4)
+                cosmeticsManager.giveCosmeticsItem(player);
+                plugin.getLogger().info("Cosmetics item given to " + player.getName());
             }
         }.runTaskLater(plugin, 5L); // 0.25 Sekunden
     }

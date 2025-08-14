@@ -11,52 +11,54 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.List;
 
 /**
- * Verwaltet den Navigator-Kompass für Spieler
+ * Verwaltet das Cosmetics-Item für Spieler
  */
-public class CompassManager {
+public class CosmeticsManager {
 
     private final JavaPlugin plugin;
 
-    public CompassManager(JavaPlugin plugin) {
+    public CosmeticsManager(JavaPlugin plugin) {
         this.plugin = plugin;
     }
 
     /**
-     * Gibt einem Spieler den Navigator-Kompass
+     * Gibt einem Spieler das Cosmetics-Item
      */
-    public void giveNavigatorCompass(Player player) {
-        ItemStack compass = createNavigatorCompass();
+    public void giveCosmeticsItem(Player player) {
+        ItemStack cosmetics = createCosmeticsItem();
 
-        // Kompass in Slot 0 setzen (erstes Slot der Hotbar)
-        player.getInventory().setItem(0, compass);
+        // Cosmetics in Slot 4 setzen (5. Slot der Hotbar)
+        player.getInventory().setItem(4, cosmetics);
     }
 
     /**
-     * Erstellt den Navigator-Kompass
+     * Erstellt das Cosmetics-Item
      */
-    private ItemStack createNavigatorCompass() {
-        ItemStack compass = new ItemStack(Material.COMPASS);
-        ItemMeta meta = compass.getItemMeta();
+    private ItemStack createCosmeticsItem() {
+        ItemStack cosmetics = new ItemStack(Material.CHEST);
+        ItemMeta meta = cosmetics.getItemMeta();
 
         if (meta != null) {
             // Name mit Farbcode
-            meta.setDisplayName(translateColorCodes("&5&lNavigator"));
+            meta.setDisplayName(translateColorCodes("&c&lCosmetics"));
 
             // Lore hinzufügen
             meta.setLore(List.of(
-                    translateColorCodes("&7Right-click to open the server selector!")
+                    translateColorCodes("&7Right-click to open cosmetics!")
             ));
 
-            compass.setItemMeta(meta);
+            cosmetics.setItemMeta(meta);
         }
-        return compass;
+
+        // Als Lobby-Item markieren damit es nicht verschoben werden kann
+        return cosmetics;
     }
 
     /**
-     * Prüft ob ein Item der Navigator-Kompass ist
+     * Prüft ob ein Item das Cosmetics-Item ist
      */
-    public boolean isNavigatorCompass(ItemStack item) {
-        if (item == null || item.getType() != Material.COMPASS) {
+    public boolean isCosmeticsItem(ItemStack item) {
+        if (item == null || item.getType() != Material.CHEST) {
             return false;
         }
 
@@ -66,7 +68,7 @@ public class CompassManager {
         }
 
         String displayName = ChatColor.stripColor(meta.getDisplayName());
-        return displayName.equals("Navigator");
+        return displayName.equals("Cosmetics");
     }
 
     /**

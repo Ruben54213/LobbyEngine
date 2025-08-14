@@ -58,14 +58,25 @@ public class ServerNavigatorGUI implements Listener {
      */
     public void openNavigator(Player player) {
         // GUI erstellen (5 Zeilen = 45 Slots)
-        Inventory gui = Bukkit.createInventory(null, 45, translateColorCodes("&d&lServer Navigator"));
+        Inventory gui = Bukkit.createInventory(null, 45, translateColorCodes(plugin.getConfig().getString("shortprefix", "") + "&7Select a &eServer"));
 
-        // Server-Items hinzufügen
+        // Gray Stained Glass Panes für Ränder erstellen
+        ItemStack glassBorder = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+        ItemMeta glassMeta = glassBorder.getItemMeta();
+        if (glassMeta != null) {
+            glassMeta.setDisplayName(translateColorCodes("&7"));
+            glassBorder.setItemMeta(glassMeta);
+        }
+
+        // Ränder mit Gray Stained Glass Panes füllen
+        fillBorders(gui, glassBorder);
+
+        // Server-Items nur in erlaubte Slots hinzufügen
         for (Map.Entry<Integer, String> entry : serverSlots.entrySet()) {
             int slot = entry.getKey();
             String serverKey = entry.getValue();
 
-            if (slot >= 0 && slot < 45) {
+            if (isValidServerSlot(slot)) {
                 ItemStack serverItem = createServerItem(serverKey);
                 if (serverItem != null) {
                     gui.setItem(slot, serverItem);
@@ -86,6 +97,43 @@ public class ServerNavigatorGUI implements Listener {
 
         // GUI öffnen
         player.openInventory(gui);
+    }
+
+    /**
+     * Füllt die Ränder des GUIs mit Gray Stained Glass Panes
+     */
+    private void fillBorders(Inventory gui, ItemStack borderItem) {
+        // Erste Zeile (Slots 0-8)
+        for (int i = 0; i < 9; i++) {
+            gui.setItem(i, borderItem);
+        }
+
+        // Letzte Zeile (Slots 36-44)
+        for (int i = 36; i < 45; i++) {
+            gui.setItem(i, borderItem);
+        }
+
+        // Linke und rechte Ränder
+        for (int row = 1; row < 4; row++) { // Zeilen 1-3
+            gui.setItem(row * 9, borderItem);     // Linker Rand
+            gui.setItem(row * 9 + 8, borderItem); // Rechter Rand
+        }
+    }
+
+    /**
+     * Prüft ob ein Slot für Server-Items erlaubt ist (nicht an den Rändern)
+     */
+    private boolean isValidServerSlot(int slot) {
+        if (slot < 0 || slot >= 45) return false;
+
+        // Erste und letzte Zeile sind Ränder
+        if (slot < 9 || slot >= 36) return false;
+
+        // Linke und rechte Ränder
+        int column = slot % 9;
+        if (column == 0 || column == 8) return false;
+
+        return true;
     }
 
     /**

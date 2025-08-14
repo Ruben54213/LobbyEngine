@@ -37,6 +37,20 @@ messages:
     slot-empty: "&7Slot &e%slot%&7 is &cempty&7!"
     created: "&7Server &e%server%&7 created in slot &e%slot%&7!"
     removed: "&7Server &cremoved&7 from slot &e%slot%&7!"
+  cosmetics:
+    locked-message: "&7You &cdont&7 have the &ePermission&7 to do this!"
+    locked: "&c✗ Locked"
+    unlocked: "&a✓ Unlocked"
+    back: "&7« &fBack"
+    return: "&7Return to main menu"
+    particles-disabled: "&eParticles &7have been &asuccessfully &cdisabled&7!"
+    effects-disabled: "&eEffects &7have been &asuccessfully &cdisabled&7!"
+    gadget-removed: "&eGadgets &7have been &asuccessfully &cremoved&7!"
+    remove-buttons:
+      reset: "&c&lReset"
+      gadget: "&7Click to &cremove&7 current &egadget&7!"
+      particle: "&7Click to &cremove&7 current &eparticle&7!"
+      effect: "&7Click to &cremove&7 current &eeffect&7!"
 
 entityspawn:
   blocked: true

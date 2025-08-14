@@ -6,13 +6,19 @@ import net.Ruben54213.lobbyEngine.Commands.SetSpawnCommand;
 import net.Ruben54213.lobbyEngine.Commands.SpawnCommand;
 import net.Ruben54213.lobbyEngine.Listeners.BlockDecayListener;
 import net.Ruben54213.lobbyEngine.Listeners.BuildProtListener;
+import net.Ruben54213.lobbyEngine.Listeners.CosmeticsListener;
 import net.Ruben54213.lobbyEngine.Listeners.EntitySpawnListener;
 import net.Ruben54213.lobbyEngine.Listeners.InventoryProtListener;
 import net.Ruben54213.lobbyEngine.Listeners.NavigatorListener;
 import net.Ruben54213.lobbyEngine.Listeners.PlayerJoinListener;
 import net.Ruben54213.lobbyEngine.Utility.CompassManager;
+import net.Ruben54213.lobbyEngine.Utility.CosmeticsFeatures;
+import net.Ruben54213.lobbyEngine.Utility.CosmeticsGUI;
+import net.Ruben54213.lobbyEngine.Utility.CosmeticsManager;
 import net.Ruben54213.lobbyEngine.Utility.ServerNavigatorGUI;
 import net.Ruben54213.lobbyEngine.Utility.SpawnManager;
+import net.Ruben54213.lobbyEngine.Listeners.PlayerQuitListener;
+import net.Ruben54213.lobbyEngine.Utility.LobbyProtectionManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class LobbyEngine extends JavaPlugin {
@@ -20,6 +26,9 @@ public final class LobbyEngine extends JavaPlugin {
     private SpawnManager spawnManager;
     private CompassManager compassManager;
     private ServerNavigatorGUI navigatorGUI;
+    private CosmeticsManager cosmeticsManager;
+    private CosmeticsFeatures cosmeticsFeatures;
+    private CosmeticsGUI cosmeticsGUI;
 
     @Override
     public void onEnable() {
@@ -39,6 +48,15 @@ public final class LobbyEngine extends JavaPlugin {
 
         // ServerNavigatorGUI initialisieren
         navigatorGUI = new ServerNavigatorGUI(this);
+
+        // CosmeticsManager initialisieren
+        cosmeticsManager = new CosmeticsManager(this);
+
+        // CosmeticsFeatures initialisieren
+        cosmeticsFeatures = new CosmeticsFeatures(this);
+
+        // CosmeticsGUI initialisieren (mit CosmeticsFeatures)
+        cosmeticsGUI = new CosmeticsGUI(this, cosmeticsFeatures);
 
         // Listener registrieren
         registerListeners();
@@ -60,6 +78,7 @@ public final class LobbyEngine extends JavaPlugin {
      * Registriert alle Event-Listener
      */
     private void registerListeners() {
+
         // Build-Protection Listener
         BuildProtListener buildProtListener = new BuildProtListener(this);
         buildProtListener.register();
@@ -76,16 +95,36 @@ public final class LobbyEngine extends JavaPlugin {
         BlockDecayListener blockDecayListener = new BlockDecayListener(this);
         blockDecayListener.register();
 
-        // Player-Join Listener
-        PlayerJoinListener playerJoinListener = new PlayerJoinListener(this, spawnManager, compassManager);
+        // Player-Join Listener (mit CosmeticsManager)
+        PlayerJoinListener playerJoinListener = new PlayerJoinListener(this, spawnManager, compassManager, cosmeticsManager);
         playerJoinListener.register();
 
         // Navigator Listener
         NavigatorListener navigatorListener = new NavigatorListener(this, compassManager, navigatorGUI);
         navigatorListener.register();
 
+        LobbyProtectionManager protectionManager = new LobbyProtectionManager(this);
+
+// Dann den PlayerQuitListener mit allen 3 Parametern erstellen
+        PlayerQuitListener playerQuitListener = new PlayerQuitListener(this, cosmeticsFeatures, protectionManager);
+        playerQuitListener.register();
+
+// Beide Manager registrieren
+        cosmeticsFeatures.register();
+        protectionManager.register();
+
+        // Cosmetics Listener
+        CosmeticsListener cosmeticsListener = new CosmeticsListener(this, cosmeticsManager, cosmeticsGUI);
+        cosmeticsListener.register();
+
         // Navigator GUI Listener registrieren
         navigatorGUI.register();
+
+        // Cosmetics Features Listener registrieren
+        cosmeticsFeatures.register();
+
+        // Cosmetics GUI Listener registrieren
+        cosmeticsGUI.register();
 
         getLogger().info("All listeners have been registered!");
     }
