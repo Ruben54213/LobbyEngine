@@ -1,9 +1,6 @@
 package net.Ruben54213.lobbyEngine;
 
-import net.Ruben54213.lobbyEngine.Commands.EntitySpawnCommand;
-import net.Ruben54213.lobbyEngine.Commands.LobbyCommand;
-import net.Ruben54213.lobbyEngine.Commands.SetSpawnCommand;
-import net.Ruben54213.lobbyEngine.Commands.SpawnCommand;
+import net.Ruben54213.lobbyEngine.Commands.*;
 import net.Ruben54213.lobbyEngine.Listeners.BlockDecayListener;
 import net.Ruben54213.lobbyEngine.Listeners.BuildProtListener;
 import net.Ruben54213.lobbyEngine.Listeners.CosmeticsListener;
@@ -11,14 +8,8 @@ import net.Ruben54213.lobbyEngine.Listeners.EntitySpawnListener;
 import net.Ruben54213.lobbyEngine.Listeners.InventoryProtListener;
 import net.Ruben54213.lobbyEngine.Listeners.NavigatorListener;
 import net.Ruben54213.lobbyEngine.Listeners.PlayerJoinListener;
-import net.Ruben54213.lobbyEngine.Utility.CompassManager;
-import net.Ruben54213.lobbyEngine.Utility.CosmeticsFeatures;
-import net.Ruben54213.lobbyEngine.Utility.CosmeticsGUI;
-import net.Ruben54213.lobbyEngine.Utility.CosmeticsManager;
-import net.Ruben54213.lobbyEngine.Utility.ServerNavigatorGUI;
-import net.Ruben54213.lobbyEngine.Utility.SpawnManager;
+import net.Ruben54213.lobbyEngine.Utility.*;
 import net.Ruben54213.lobbyEngine.Listeners.PlayerQuitListener;
-import net.Ruben54213.lobbyEngine.Utility.LobbyProtectionManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class LobbyEngine extends JavaPlugin {
@@ -29,6 +20,11 @@ public final class LobbyEngine extends JavaPlugin {
     private CosmeticsManager cosmeticsManager;
     private CosmeticsFeatures cosmeticsFeatures;
     private CosmeticsGUI cosmeticsGUI;
+    private LobbyProtectionManager protectionManager;
+    private PlayerInvulnerabilityManager invulnerabilityManager;
+    private PlayerInventoryManager inventoryManager;
+    private PlayerHeadManager playerHeadManager;
+    private LobbyManager lobbyManager;
 
     @Override
     public void onEnable() {
@@ -40,6 +36,38 @@ public final class LobbyEngine extends JavaPlugin {
         // Config neu laden um sicherzustellen dass alle Werte geladen sind
         reloadConfig();
 
+        // Manager initialisieren
+        initializeManagers();
+
+        // Listener registrieren
+        registerListeners();
+
+        // Commands registrieren
+        registerCommands();
+
+        // Startup-Nachricht
+        getLogger().info("LobbyEngine has been enabled successfully!");
+    }
+
+    @Override
+    public void onDisable() {
+        // Cleanup beim Shutdown
+        if (invulnerabilityManager != null) {
+            invulnerabilityManager.removeAllInvulnerability();
+        }
+
+        if (inventoryManager != null) {
+            inventoryManager.clearAllStoredInventories();
+        }
+
+        // Plugin shutdown logic
+        getLogger().info("LobbyEngine has been disabled!");
+    }
+
+    /**
+     * Initialisiert alle Manager
+     */
+    private void initializeManagers() {
         // SpawnManager initialisieren
         spawnManager = new SpawnManager(this);
 
@@ -58,20 +86,26 @@ public final class LobbyEngine extends JavaPlugin {
         // CosmeticsGUI initialisieren (mit CosmeticsFeatures)
         cosmeticsGUI = new CosmeticsGUI(this, cosmeticsFeatures);
 
-        // Listener registrieren
-        registerListeners();
+        // LobbyProtectionManager initialisieren
+        protectionManager = new LobbyProtectionManager(this);
 
-        // Commands registrieren
-        registerCommands();
+        // PlayerInvulnerabilityManager initialisieren
+        invulnerabilityManager = new PlayerInvulnerabilityManager(this);
 
-        // Startup-Nachricht
-        getLogger().info("LobbyEngine has been enabled successfully!");
-    }
+        // PlayerInventoryManager initialisieren
+        inventoryManager = new PlayerInventoryManager(this, compassManager, cosmeticsManager);
 
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
-        getLogger().info("LobbyEngine has been disabled!");
+        // PlayerHeadManager initialisieren
+        playerHeadManager = new PlayerHeadManager(this);
+
+        // LobbyManager initialisieren
+        lobbyManager = new LobbyManager(this);
+
+        // WICHTIG: Manager-Referenzen setzen NACH der Initialisierung
+        inventoryManager.setPlayerHeadManager(playerHeadManager);
+        inventoryManager.setLobbyManager(lobbyManager);
+
+        getLogger().info("All managers have been initialized!");
     }
 
     /**
@@ -95,36 +129,31 @@ public final class LobbyEngine extends JavaPlugin {
         BlockDecayListener blockDecayListener = new BlockDecayListener(this);
         blockDecayListener.register();
 
-        // Player-Join Listener (mit CosmeticsManager)
-        PlayerJoinListener playerJoinListener = new PlayerJoinListener(this, spawnManager, compassManager, cosmeticsManager);
+        // Player-Join Listener (mit CosmeticsManager UND LobbyManager)
+        PlayerJoinListener playerJoinListener = new PlayerJoinListener(this, spawnManager, compassManager, cosmeticsManager, lobbyManager);
         playerJoinListener.register();
 
         // Navigator Listener
         NavigatorListener navigatorListener = new NavigatorListener(this, compassManager, navigatorGUI);
         navigatorListener.register();
 
-        LobbyProtectionManager protectionManager = new LobbyProtectionManager(this);
-
-// Dann den PlayerQuitListener mit allen 3 Parametern erstellen
-        PlayerQuitListener playerQuitListener = new PlayerQuitListener(this, cosmeticsFeatures, protectionManager);
+        // PlayerQuitListener mit allen notwendigen Managern
+        PlayerQuitListener playerQuitListener = new PlayerQuitListener(this, cosmeticsFeatures, protectionManager, invulnerabilityManager, inventoryManager);
         playerQuitListener.register();
-
-// Beide Manager registrieren
-        cosmeticsFeatures.register();
-        protectionManager.register();
 
         // Cosmetics Listener
         CosmeticsListener cosmeticsListener = new CosmeticsListener(this, cosmeticsManager, cosmeticsGUI);
         cosmeticsListener.register();
 
-        // Navigator GUI Listener registrieren
-        navigatorGUI.register();
-
-        // Cosmetics Features Listener registrieren
+        // Alle Manager registrieren
+        protectionManager.register();
+        invulnerabilityManager.register();
+        inventoryManager.register();
+        playerHeadManager.register();
+        lobbyManager.register();
         cosmeticsFeatures.register();
-
-        // Cosmetics GUI Listener registrieren
         cosmeticsGUI.register();
+        navigatorGUI.register();
 
         getLogger().info("All listeners have been registered!");
     }
@@ -158,14 +187,72 @@ public final class LobbyEngine extends JavaPlugin {
         }
 
         // Lobby Command
-        if (getCommand("lobby") != null) {
-            LobbyCommand lobbyCommand = new LobbyCommand(this, navigatorGUI);
-            getCommand("lobby").setExecutor(lobbyCommand);
-            getCommand("lobby").setTabCompleter(lobbyCommand);
+        if (getCommand("lobbies") != null) {
+            LobbiesCommand lobbiesCommand = new LobbiesCommand(this, lobbyManager);
+            getCommand("lobbies").setExecutor(lobbiesCommand);
+            getCommand("lobbies").setTabCompleter(lobbiesCommand);
         } else {
-            getLogger().warning("Command 'lobby' not found in plugin.yml!");
+            getLogger().warning("Command 'lobbies' not found in plugin.yml!");
         }
 
         getLogger().info("Commands have been registered!");
+    }
+
+    // ==================== GETTER METHODEN ====================
+
+    /**
+     * Gibt den SpawnManager zurück
+     */
+    public SpawnManager getSpawnManager() {
+        return spawnManager;
+    }
+
+    /**
+     * Gibt den CompassManager zurück
+     */
+    public CompassManager getCompassManager() {
+        return compassManager;
+    }
+
+    /**
+     * Gibt den CosmeticsManager zurück
+     */
+    public CosmeticsManager getCosmeticsManager() {
+        return cosmeticsManager;
+    }
+
+    /**
+     * Gibt den PlayerInvulnerabilityManager zurück
+     */
+    public PlayerInvulnerabilityManager getInvulnerabilityManager() {
+        return invulnerabilityManager;
+    }
+
+    /**
+     * Gibt den PlayerInventoryManager zurück
+     */
+    public PlayerInventoryManager getInventoryManager() {
+        return inventoryManager;
+    }
+
+    /**
+     * Gibt den LobbyProtectionManager zurück
+     */
+    public LobbyProtectionManager getProtectionManager() {
+        return protectionManager;
+    }
+
+    /**
+     * Gibt den PlayerHeadManager zurück
+     */
+    public PlayerHeadManager getPlayerHeadManager() {
+        return playerHeadManager;
+    }
+
+    /**
+     * Gibt den LobbyManager zurück
+     */
+    public LobbyManager getLobbyManager() {
+        return lobbyManager;
     }
 }

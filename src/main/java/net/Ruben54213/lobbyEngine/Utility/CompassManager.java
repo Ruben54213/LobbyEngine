@@ -40,7 +40,7 @@ public class CompassManager {
 
         if (meta != null) {
             // Name mit Farbcode
-            meta.setDisplayName(translateColorCodes("&5&lNavigator"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.navigator.navigator-item", "&5&lNavigator &8&l|&7 Rightclick")));
 
             // Lore hinzufügen
             meta.setLore(List.of(
@@ -65,8 +65,12 @@ public class CompassManager {
             return false;
         }
 
-        String displayName = ChatColor.stripColor(meta.getDisplayName());
-        return displayName.equals("Navigator");
+        // Hole den erwarteten Namen aus der Config
+        String expectedName = translateColorCodes(plugin.getConfig().getString("messages.navigator.navigator-item", "&5&lNavigator &8&l|&7 Rightclick"));
+        String actualName = meta.getDisplayName();
+
+        // Vergleiche die Namen direkt (mit Farbcodes)
+        return expectedName.equals(actualName);
     }
 
     /**

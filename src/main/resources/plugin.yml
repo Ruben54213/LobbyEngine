@@ -29,6 +29,11 @@ commands:
     permission: lobbyengine.lobby
     permission-message: "&cYou don't have permission to use this command!"
 
+  lobbies:
+    description: Manage lobbies
+    usage: /lobbies <create|remove|list|gui|reload>
+    permission: lobbyengine.lobbies
+
 permissions:
   lobbyengine.*:
     description: Gives access to all LobbyEngine commands

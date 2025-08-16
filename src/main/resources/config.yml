@@ -32,30 +32,174 @@ messages:
       - ""
       - "&e&l◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆"
   navigator:
+    navigator-item: "&5&lNavigator &8&l|&7 Rightclick"
     connecting: "&7You will &enow&7 be connected to &a%server%&7..."
     slot-occupied: "&7Slot &e%slot%&7 is &calready&7 occupied!"
     slot-empty: "&7Slot &e%slot%&7 is &cempty&7!"
     created: "&7Server &e%server%&7 created in slot &e%slot%&7!"
     removed: "&7Server &cremoved&7 from slot &e%slot%&7!"
   cosmetics:
-    locked-message: "&7You &cdont&7 have the &ePermission&7 to do this!"
+    cosmetics-lore: "&eRight-click &7to open cosmetics!"
+    cosmetics-item: "&c&lCosmetics &8&l| &7Rightclick"
+    locked-message: "&7You &cdon't&7 have the &epermission&7 to do this!"
     locked: "&c✗ Locked"
     unlocked: "&a✓ Unlocked"
     back: "&7« &fBack"
     return: "&7Return to main menu"
+
+    # Activation Messages
+    particles-activated: "&dParticles &7activated: &f%particle%"
+    effect-activated: "&aEffect &7activated: &f%effect%"
+    gadget-received: "&eGadget &7received: &f%gadget%"
+
+    # Deactivation Messages
     particles-disabled: "&eParticles &7have been &asuccessfully &cdisabled&7!"
     effects-disabled: "&eEffects &7have been &asuccessfully &cdisabled&7!"
     gadget-removed: "&eGadgets &7have been &asuccessfully &cremoved&7!"
+
+    # Gadget Messages
+    teleporter-failed: "&c&lTeleporter &7failed: No valid target!"
+    grapplehook-failed-ground: "&c&lGrapple Hook &7failed: Hook must be on solid ground!"
+    grapplehook-failed-land: "&c&lGrapple Hook &7failed: Hook must land on solid ground first!"
+    love-received: "&d&l♥ &fYou received love from &d%shooter%&f! &d&l♥"
+
     remove-buttons:
       reset: "&c&lReset"
       gadget: "&7Click to &cremove&7 current &egadget&7!"
       particle: "&7Click to &cremove&7 current &eparticle&7!"
       effect: "&7Click to &cremove&7 current &eeffect&7!"
+    gui:
+      cosmetics: "&cCosmetics"
+      particles: "&dParticles"
+      particles-info: "&7Click to browse fun particles!"
+      effects: "&aEffects"
+      effects-info: "&7Click to browse fun effects!"
+      gadgets: "&eGadgets"
+      gadgets-info: "&7Click to browse fun gadgets!"
+    particles:
+      heart: "&c&lHeart Particles"
+      ender: "&5&lEnder Particles"
+      lava: "&6&lLava Particles"
+      water: "&b&lWater Particles"
+      fire: "&c&lFire Particles"
+      raincloud: "&7&lRain Cloud"
+    effects:
+      fly: "&f&lFly"
+      doublejump: "&e&lDouble Jump"
+      jumpboost: "&a&lJump Boost"
+      nightvision: "&6&lNight Vision"
+      speed: "&b&lSpeed"
+    gadgets:
+      teleporter-name: "&5&lTeleporter"
+      grapplehook-name: "&2&lGrapple Hook"
+      lovebow-name: "&d&lLove Bow"
 
+# Friends System Configuration
+friends:
+  # Command to execute when friends head is clicked
+  # Placeholders: %player%, %uuid%, %displayname%
+  # Use "/" prefix for player commands, no prefix for console commands
+  command: "/friends"
+
+  # Friends head display name
+  head-name: "&b&lFriends &8&l| &7Rightclick"
+
+  # Friends head lore (list)
+  head-lore:
+    - "&7Click to open friends menu!"
+    - ""
+    - "&8Your personal social hub"
+
+  # Sound settings
+  sound: "UI_BUTTON_CLICK"
+  sound-volume: 1.0
+  sound-pitch: 1.0
+
+# Lobby System Configuration
+lobby:
+  # Current server name (should match BungeeCord/Velocity server name)
+  current-server: "lobby-1"
+
+  # Lobby item settings
+  item-name: "&6&lLobby &8&l| &7Rightclick"
+  item-lore:
+    - "&7Click to switch lobbies!"
+    - ""
+    - "&8Current Lobby: &e%current_server%"
+
+  # GUI settings
+  gui-title: "&6Lobby &7Selection"
+  lobby-item-name: "&e&l%lobby%"
+
+  # Lobby item lore in GUI (FIXED - removed server info)
+  current-lobby-lore:
+    - "&a✓ Current Lobby"
+    - ""
+    - "&7You are already here!"
+
+  other-lobby-lore:
+    - "&7Click to switch!"
+
+  # Sound settings
+  sound: "UI_BUTTON_CLICK"
+  sound-volume: 1.0
+  sound-pitch: 1.0
+
+  # Messages
+  no-permission: "&cYou don't have permission for this command!"
+  already-connected: "&cYou are already connected to this lobby!"
+  connecting: "&7You will be connected to &e%lobby%&7..."
+  connection-error: "&cConnection to &e%lobby%&c failed!"
+
+  # Command messages
+  create-usage: "&cUsage: /lobbies create <server-name>"
+  remove-usage: "&cUsage: /lobbies remove <Lobby-1 to Lobby-7>"
+  invalid-name: "&cInvalid name! Only letters, numbers, - and _ are allowed."
+  created: "&aLobby &e%slot%&a was successfully created for server &e%lobby%&a!"
+  removed: "&aLobby &e%lobby%&a was successfully removed!"
+  creation-failed: "&cFailed to create lobby for server &e%server%&c!"
+  not-found: "&cLobby &e%lobby%&c was not found!"
+  max-reached: "&cMaximum number of lobbies reached! (%max%)"
+  no-lobbies: "&eNo lobbies configured."
+  players-only: "&cThis command can only be used by players!"
+  reloaded: "&aLobby configuration has been reloaded!"
+
+  # Help messages
+  help-messages:
+    - "&6=== Lobbies Commands ==="
+    - "&e/lobbies create <server-name> &7- Creates a new lobby"
+    - "&e/lobbies remove <Lobby-X> &7- Removes a lobby slot"
+    - "&e/lobbies list &7- Shows all lobbies with server mappings"
+    - "&e/lobbies gui &7- Opens the lobby GUI"
+    - "&e/lobbies reload &7- Reloads the config"
+
+  # List command messages
+  list-header: "&6=== Registered Lobbies ==="
+  list-entry: "&e- %lobby% %status%"
+  list-footer: "&7Count: &e%count%&7/&e%max%"
+
+  # Registered servers (Slot-based system)
+  # Format: slotX maps to any server name
+  servers:
+    slot1:
+      server: "lobby-1"     # Can be any server name
+      enabled: true
+    slot2:
+      server: "hub"         # Example: different server name
+      enabled: false
+    slot3:
+      server: "main"        # Example: another server name
+      enabled: false
+    # Add more slots as needed (up to slot7)
+
+
+# Entity and Block Settings
 entityspawn:
   blocked: true
 blockdecay:
   blocked: true
+
+# Spawn Settings
 spawn:
   teleport-on-join: true
   sounds:
@@ -71,6 +215,8 @@ spawn:
     pitch2: 1.5
     pitch3: 2.0
     confirm-pitch: 2.0
+
+# Navigator Settings
 navigator:
   sounds:
     open: "UI_BUTTON_CLICK"

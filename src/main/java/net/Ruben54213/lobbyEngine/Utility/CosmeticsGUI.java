@@ -37,7 +37,7 @@ public class CosmeticsGUI implements Listener {
      */
     public void openMainCosmeticsGUI(Player player) {
         // 3 Zeilen GUI erstellen
-        Inventory gui = Bukkit.createInventory(null, 27, translateColorCodes("&c&lCosmetics"));
+        Inventory gui = Bukkit.createInventory(null, 27, translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.cosmetics", "")));
 
         // Glass Borders erstellen
         fillBorders(gui);
@@ -58,7 +58,7 @@ public class CosmeticsGUI implements Listener {
      * Öffnet das Partikel-GUI
      */
     public void openParticlesGUI(Player player) {
-        Inventory gui = Bukkit.createInventory(null, 27, translateColorCodes("&d&lParticles"));
+        Inventory gui = Bukkit.createInventory(null, 27, translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.particles", "")));
         fillBorders(gui);
 
         // Partikel-Items hinzufügen
@@ -83,7 +83,7 @@ public class CosmeticsGUI implements Listener {
      * Öffnet das Effekte-GUI
      */
     public void openEffectsGUI(Player player) {
-        Inventory gui = Bukkit.createInventory(null, 27, translateColorCodes("&a&lEffects"));
+        Inventory gui = Bukkit.createInventory(null, 27, translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.effects", "")));
         fillBorders(gui);
 
         // Effekt-Items hinzufügen
@@ -107,16 +107,15 @@ public class CosmeticsGUI implements Listener {
      * Öffnet das Gadgets-GUI
      */
     public void openGadgetsGUI(Player player) {
-        Inventory gui = Bukkit.createInventory(null, 27, translateColorCodes("&e&lGadgets"));
+        Inventory gui = Bukkit.createInventory(null, 27, translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.gadgets", "")));
         fillBorders(gui);
 
         // Gadget-Items hinzufügen
-        gui.setItem(10, createTeleporterItem(player));
-        gui.setItem(12, createGrappleHookItem(player));
-        gui.setItem(14, createLoveBowItem(player));
+        gui.setItem(11, createTeleporterItem(player));
+        gui.setItem(15, createGrappleHookItem(player));
 
         // Reset-Button hinzufügen
-        gui.setItem(13, createGadgetResetButton());
+        gui.setItem(13, createGadgetResetButton()); // Position geändert wegen Love Bow
 
         // Zurück-Button
         gui.setItem(22, createBackButton());
@@ -153,9 +152,9 @@ public class CosmeticsGUI implements Listener {
         ItemStack item = new ItemStack(Material.SUGAR);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(translateColorCodes("&d&lParticles"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gui.particles", "")));
             meta.setLore(List.of(
-                    translateColorCodes("&7Click to browse particle effects!")
+                    translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gui.particles-info", ""))
             ));
             item.setItemMeta(meta);
         }
@@ -163,12 +162,12 @@ public class CosmeticsGUI implements Listener {
     }
 
     private ItemStack createEffectsItem() {
-        ItemStack item = new ItemStack(Material.POTION);
-        PotionMeta meta = (PotionMeta) item.getItemMeta();
+        ItemStack item = new ItemStack(Material.GLASS_BOTTLE);
+        ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(translateColorCodes("&a&lEffects"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gui.effects", "")));
             meta.setLore(List.of(
-                    translateColorCodes("&7Click to browse special effects!")
+                    translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gui.effects-info", ""))
             ));
             item.setItemMeta(meta);
         }
@@ -179,9 +178,9 @@ public class CosmeticsGUI implements Listener {
         ItemStack item = new ItemStack(Material.PISTON);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(translateColorCodes("&e&lGadgets"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gui.gadgets", "")));
             meta.setLore(List.of(
-                    translateColorCodes("&7Click to browse fun gadgets!")
+                    translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gui.gadgets-info", ""))
             ));
             item.setItemMeta(meta);
         }
@@ -194,7 +193,7 @@ public class CosmeticsGUI implements Listener {
         ItemStack item = new ItemStack(Material.RED_DYE);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(translateColorCodes("&c&lHeart Particles"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.particles.heart", "")));
             boolean hasPermission = player.hasPermission("lobbyengine.cosmetics.particles.heart");
             meta.setLore(hasPermission ?
                     List.of(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.unlocked", ""))) :
@@ -209,7 +208,7 @@ public class CosmeticsGUI implements Listener {
         ItemStack item = new ItemStack(Material.ENDER_PEARL);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(translateColorCodes("&5&lEnder Particles"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.particles.ender", "")));
             boolean hasPermission = player.hasPermission("lobbyengine.cosmetics.particles.ender");
             meta.setLore(hasPermission ?
                     List.of(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.unlocked", ""))) :
@@ -224,7 +223,7 @@ public class CosmeticsGUI implements Listener {
         ItemStack item = new ItemStack(Material.LAVA_BUCKET);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(translateColorCodes("&6&lLava Particles"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.particles.lava", "")));
             boolean hasPermission = player.hasPermission("lobbyengine.cosmetics.particles.lava");
             meta.setLore(hasPermission ?
                     List.of(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.unlocked", ""))) :
@@ -239,7 +238,7 @@ public class CosmeticsGUI implements Listener {
         ItemStack item = new ItemStack(Material.WATER_BUCKET);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(translateColorCodes("&b&lWater Particles"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.particles.water", "")));
             boolean hasPermission = player.hasPermission("lobbyengine.cosmetics.particles.water");
             meta.setLore(hasPermission ?
                     List.of(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.unlocked", ""))) :
@@ -254,7 +253,7 @@ public class CosmeticsGUI implements Listener {
         ItemStack item = new ItemStack(Material.FIRE_CHARGE);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(translateColorCodes("&c&lFire Particles"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.particles.fire", "")));
             boolean hasPermission = player.hasPermission("lobbyengine.cosmetics.particles.fire");
             meta.setLore(hasPermission ?
                     List.of(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.unlocked", ""))) :
@@ -269,7 +268,7 @@ public class CosmeticsGUI implements Listener {
         ItemStack item = new ItemStack(Material.GRAY_WOOL);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(translateColorCodes("&7&lRain Cloud"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.particles.raincloud", "")));
             boolean hasPermission = player.hasPermission("lobbyengine.cosmetics.particles.raincloud");
             meta.setLore(hasPermission ?
                     List.of(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.unlocked", ""))) :
@@ -286,7 +285,7 @@ public class CosmeticsGUI implements Listener {
         ItemStack item = new ItemStack(Material.FEATHER);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(translateColorCodes("&f&lFly"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.effects.fly", "")));
             boolean hasPermission = player.hasPermission("lobbyengine.cosmetics.effects.fly");
             meta.setLore(hasPermission ?
                     List.of(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.unlocked", ""))) :
@@ -301,7 +300,7 @@ public class CosmeticsGUI implements Listener {
         ItemStack item = new ItemStack(Material.RABBIT_FOOT);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(translateColorCodes("&e&lDouble Jump"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.effects.doublejump", "")));
             boolean hasPermission = player.hasPermission("lobbyengine.cosmetics.effects.doublejump");
             meta.setLore(hasPermission ?
                     List.of(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.unlocked", ""))) :
@@ -316,7 +315,7 @@ public class CosmeticsGUI implements Listener {
         ItemStack item = new ItemStack(Material.SLIME_BALL);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(translateColorCodes("&a&lJump Boost"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.effects.jumpboost", "")));
             boolean hasPermission = player.hasPermission("lobbyengine.cosmetics.effects.jumpboost");
             meta.setLore(hasPermission ?
                     List.of(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.unlocked", ""))) :
@@ -331,7 +330,7 @@ public class CosmeticsGUI implements Listener {
         ItemStack item = new ItemStack(Material.GOLDEN_CARROT);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(translateColorCodes("&6&lNight Vision"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.effects.nightvision", "")));
             boolean hasPermission = player.hasPermission("lobbyengine.cosmetics.effects.nightvision");
             meta.setLore(hasPermission ?
                     List.of(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.unlocked", ""))) :
@@ -346,7 +345,7 @@ public class CosmeticsGUI implements Listener {
         ItemStack item = new ItemStack(Material.SUGAR);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(translateColorCodes("&b&lSpeed"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.effects.speed", "")));
             boolean hasPermission = player.hasPermission("lobbyengine.cosmetics.effects.speed");
             meta.setLore(hasPermission ?
                     List.of(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.unlocked", ""))) :
@@ -477,9 +476,14 @@ public class CosmeticsGUI implements Listener {
         Player player = (Player) event.getWhoClicked();
         String title = event.getView().getTitle();
 
-        // Prüfen ob es ein Cosmetics GUI ist
-        if (!title.contains("Cosmetics") && !title.contains("Particles") &&
-                !title.contains("Effects") && !title.contains("Gadgets")) {
+        // Prüfen ob es ein Cosmetics GUI ist - verbesserte Erkennung
+        String cosmeticsTitle = translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.cosmetics", ""));
+        String particlesTitle = translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.particles", ""));
+        String effectsTitle = translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.effects", ""));
+        String gadgetsTitle = translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.gadgets", ""));
+
+        if (!title.equals(cosmeticsTitle) && !title.equals(particlesTitle) &&
+                !title.equals(effectsTitle) && !title.equals(gadgetsTitle)) {
             return;
         }
 
@@ -499,7 +503,10 @@ public class CosmeticsGUI implements Listener {
      * Behandelt Navigation zwischen verschiedenen GUIs
      */
     private void handleGUINavigation(Player player, String currentTitle, ItemStack clickedItem, int slot) {
-        if (currentTitle.equals(translateColorCodes("&c&lCosmetics"))) {
+        // Erkenne Haupt-Cosmetics GUI
+        String cosmeticsTitle = translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.cosmetics", ""));
+
+        if (currentTitle.equals(cosmeticsTitle)) {
             // Haupt-Menu Navigation
             if (slot == 11) openParticlesGUI(player);
             else if (slot == 13) openEffectsGUI(player);
@@ -522,20 +529,24 @@ public class CosmeticsGUI implements Listener {
         String displayName = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName());
 
         // Reset-Buttons behandeln
-        if (displayName.equals("Reset Particles")) {
-            cosmeticsFeatures.stopParticles(player);
-            player.sendMessage(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.particles-disabled", "")));
-            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
-            return;
-        } else if (displayName.equals("Reset Effects")) {
-            cosmeticsFeatures.stopEffects(player);
-            player.sendMessage(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.effects-disabled", "")));
-            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
-            return;
-        } else if (displayName.equals("Reset Gadgets")) {
-            cosmeticsFeatures.removeGadget(player);
-            player.sendMessage(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gadget-removed", "")));
-            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
+        if (displayName.equals(ChatColor.stripColor(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.remove-buttons.reset", ""))))) {
+            String particlesTitle = translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.particles", ""));
+            String effectsTitle = translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.effects", ""));
+            String gadgetsTitle = translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.gadgets", ""));
+
+            if (guiTitle.equals(particlesTitle)) {
+                cosmeticsFeatures.stopParticles(player);
+                player.sendMessage(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.particles-disabled", "")));
+                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
+            } else if (guiTitle.equals(effectsTitle)) {
+                cosmeticsFeatures.stopEffects(player);
+                player.sendMessage(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.effects-disabled", "")));
+                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
+            } else if (guiTitle.equals(gadgetsTitle)) {
+                cosmeticsFeatures.removeGadget(player);
+                player.sendMessage(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gadget-removed", "")));
+                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
+            }
             return;
         }
 
@@ -548,11 +559,15 @@ public class CosmeticsGUI implements Listener {
         }
 
         // Feature aktivieren basierend auf GUI-Typ
-        if (guiTitle.contains("Particles")) {
+        String particlesTitle = translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.particles", ""));
+        String effectsTitle = translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.effects", ""));
+        String gadgetsTitle = translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.gadgets", ""));
+
+        if (guiTitle.equals(particlesTitle)) {
             activateParticle(player, displayName);
-        } else if (guiTitle.contains("Effects")) {
+        } else if (guiTitle.equals(effectsTitle)) {
             activateEffect(player, displayName);
-        } else if (guiTitle.contains("Gadgets")) {
+        } else if (guiTitle.equals(gadgetsTitle)) {
             giveGadget(player, displayName);
         }
     }
@@ -595,21 +610,36 @@ public class CosmeticsGUI implements Listener {
      */
     private String getRequiredPermission(String displayName) {
         switch (displayName) {
-            case "Heart Particles": return "lobbyengine.cosmetics.particles.heart";
-            case "Ender Particles": return "lobbyengine.cosmetics.particles.ender";
-            case "Lava Particles": return "lobbyengine.cosmetics.particles.lava";
-            case "Water Particles": return "lobbyengine.cosmetics.particles.water";
-            case "Fire Particles": return "lobbyengine.cosmetics.particles.fire";
-            case "Rain Cloud": return "lobbyengine.cosmetics.particles.raincloud";
-            case "Fly": return "lobbyengine.cosmetics.effects.fly";
-            case "Double Jump": return "lobbyengine.cosmetics.effects.doublejump";
-            case "Jump Boost": return "lobbyengine.cosmetics.effects.jumpboost";
-            case "Night Vision": return "lobbyengine.cosmetics.effects.nightvision";
-            case "Speed": return "lobbyengine.cosmetics.effects.speed";
-            case "Teleporter": return "lobbyengine.cosmetics.gadgets.teleporter";
-            case "Grapple Hook": return "lobbyengine.cosmetics.gadgets.grapplehook";
-            case "Love Bow": return "lobbyengine.cosmetics.gadgets.lovebow";
-            default: return null;
+            case "Heart Particles":
+                return "lobbyengine.cosmetics.particles.heart";
+            case "Ender Particles":
+                return "lobbyengine.cosmetics.particles.ender";
+            case "Lava Particles":
+                return "lobbyengine.cosmetics.particles.lava";
+            case "Water Particles":
+                return "lobbyengine.cosmetics.particles.water";
+            case "Fire Particles":
+                return "lobbyengine.cosmetics.particles.fire";
+            case "Rain Cloud":
+                return "lobbyengine.cosmetics.particles.raincloud";
+            case "Fly":
+                return "lobbyengine.cosmetics.effects.fly";
+            case "Double Jump":
+                return "lobbyengine.cosmetics.effects.doublejump";
+            case "Jump Boost":
+                return "lobbyengine.cosmetics.effects.jumpboost";
+            case "Night Vision":
+                return "lobbyengine.cosmetics.effects.nightvision";
+            case "Speed":
+                return "lobbyengine.cosmetics.effects.speed";
+            case "Teleporter":
+                return "lobbyengine.cosmetics.gadgets.teleporter";
+            case "Grapple Hook":
+                return "lobbyengine.cosmetics.gadgets.grapplehook";
+            case "Love Bow":
+                return "lobbyengine.cosmetics.gadgets.lovebow";
+            default:
+                return null;
         }
     }
 
@@ -618,13 +648,20 @@ public class CosmeticsGUI implements Listener {
      */
     private String getParticleType(String displayName) {
         switch (displayName) {
-            case "Heart Particles": return "heart";
-            case "Ender Particles": return "ender";
-            case "Lava Particles": return "lava";
-            case "Water Particles": return "water";
-            case "Fire Particles": return "fire";
-            case "Rain Cloud": return "raincloud";
-            default: return null;
+            case "Heart Particles":
+                return "heart";
+            case "Ender Particles":
+                return "ender";
+            case "Lava Particles":
+                return "lava";
+            case "Water Particles":
+                return "water";
+            case "Fire Particles":
+                return "fire";
+            case "Rain Cloud":
+                return "raincloud";
+            default:
+                return null;
         }
     }
 
@@ -633,12 +670,18 @@ public class CosmeticsGUI implements Listener {
      */
     private String getEffectType(String displayName) {
         switch (displayName) {
-            case "Fly": return "fly";
-            case "Double Jump": return "doublejump";
-            case "Jump Boost": return "jumpboost";
-            case "Night Vision": return "nightvision";
-            case "Speed": return "speed";
-            default: return null;
+            case "Fly":
+                return "fly";
+            case "Double Jump":
+                return "doublejump";
+            case "Jump Boost":
+                return "jumpboost";
+            case "Night Vision":
+                return "nightvision";
+            case "Speed":
+                return "speed";
+            default:
+                return null;
         }
     }
 
@@ -647,10 +690,14 @@ public class CosmeticsGUI implements Listener {
      */
     private String getGadgetType(String displayName) {
         switch (displayName) {
-            case "Teleporter": return "teleporter";
-            case "Grapple Hook": return "grapplehook";
-            case "Love Bow": return "lovebow";
-            default: return null;
+            case "Teleporter":
+                return "teleporter";
+            case "Grapple Hook":
+                return "grapplehook";
+            case "Love Bow":
+                return "lovebow";
+            default:
+                return null;
         }
     }
 

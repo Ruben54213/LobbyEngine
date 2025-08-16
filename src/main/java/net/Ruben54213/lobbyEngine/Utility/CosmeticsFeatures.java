@@ -73,7 +73,11 @@ public class CosmeticsFeatures implements Listener {
         }.runTaskTimer(plugin, 0L, 5L); // Alle 0.25 Sekunden
 
         particleTasks.put(uuid, task);
-        player.sendMessage(translateColorCodes("&d&lParticles &7activated: &f" + formatParticleName(particleType)));
+
+        // Konfigurierbare Aktivierungsnachricht
+        String message = plugin.getConfig().getString("messages.cosmetics.particles-activated", "&d&lParticles &7activated: &f%particle%");
+        message = message.replace("%particle%", formatParticleName(particleType));
+        player.sendMessage(translateColorCodes(plugin.getConfig().getString("prefix", "") + message));
     }
 
     /**
@@ -173,7 +177,10 @@ public class CosmeticsFeatures implements Listener {
                 break;
         }
 
-        player.sendMessage(translateColorCodes("&a&lEffect &7activated: &f" + formatEffectName(effectType)));
+        // Konfigurierbare Aktivierungsnachricht
+        String message = plugin.getConfig().getString("messages.cosmetics.effect-activated", "&a&lEffect &7activated: &f%effect%");
+        message = message.replace("%effect%", formatEffectName(effectType));
+        player.sendMessage(translateColorCodes(plugin.getConfig().getString("prefix", "") + message));
     }
 
     /**
@@ -234,7 +241,11 @@ public class CosmeticsFeatures implements Listener {
         if (gadget != null) {
             // Gadget in Slot 3 setzen (4. Slot der Hotbar, neben Cosmetics)
             player.getInventory().setItem(3, gadget);
-            player.sendMessage(translateColorCodes("&e&lGadget &7received: &f" + formatGadgetName(gadgetType)));
+
+            // Konfigurierbare Gadget-Nachricht
+            String message = plugin.getConfig().getString("messages.cosmetics.gadget-received", "&e&lGadget &7received: &f%gadget%");
+            message = message.replace("%gadget%", formatGadgetName(gadgetType));
+            player.sendMessage(translateColorCodes(plugin.getConfig().getString("prefix", "") + message));
         }
     }
 
@@ -258,7 +269,8 @@ public class CosmeticsFeatures implements Listener {
                 item = new ItemStack(Material.ENDER_EYE);
                 meta = item.getItemMeta();
                 if (meta != null) {
-                    meta.setDisplayName(translateColorCodes("&5&lTeleporter"));
+                    String name = plugin.getConfig().getString("messages.cosmetics.gadgets.teleporter-name", "&5&lTeleporter");
+                    meta.setDisplayName(translateColorCodes(name));
                     item.setItemMeta(meta);
                 }
                 break;
@@ -266,7 +278,8 @@ public class CosmeticsFeatures implements Listener {
                 item = new ItemStack(Material.FISHING_ROD);
                 meta = item.getItemMeta();
                 if (meta != null) {
-                    meta.setDisplayName(translateColorCodes("&2&lGrapple Hook"));
+                    String name = plugin.getConfig().getString("messages.cosmetics.gadgets.grapplehook-name", "&2&lGrapple Hook");
+                    meta.setDisplayName(translateColorCodes(name));
                     item.setItemMeta(meta);
                 }
                 break;
@@ -274,7 +287,8 @@ public class CosmeticsFeatures implements Listener {
                 item = new ItemStack(Material.BOW);
                 meta = item.getItemMeta();
                 if (meta != null) {
-                    meta.setDisplayName(translateColorCodes("&d&lLove Bow"));
+                    String name = plugin.getConfig().getString("messages.cosmetics.gadgets.lovebow-name", "&d&lLove Bow");
+                    meta.setDisplayName(translateColorCodes(name));
                     item.setItemMeta(meta);
                 }
                 break;
@@ -334,7 +348,7 @@ public class CosmeticsFeatures implements Listener {
 
         String displayName = ChatColor.stripColor(item.getItemMeta().getDisplayName());
 
-        if (displayName.equals("Teleporter")) {
+        if (displayName.equals(ChatColor.stripColor(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gadgets.teleporter-name", "Teleporter"))))) {
             handleTeleporter(player);
             event.setCancelled(true);
         }
@@ -360,7 +374,9 @@ public class CosmeticsFeatures implements Listener {
             player.getWorld().spawnParticle(Particle.PORTAL, teleportLoc, 20, 0.5, 1, 0.5, 0.1);
             player.playSound(teleportLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.2f);
         } else {
-            player.sendMessage(translateColorCodes("&c&lTeleporter &7failed: No valid target!"));
+            // Konfigurierbare Fehlernachricht
+            String message = plugin.getConfig().getString("messages.cosmetics.teleporter-failed", "&c&lTeleporter &7failed: No valid target!");
+            player.sendMessage(translateColorCodes(plugin.getConfig().getString("prefix", "") + message));
         }
     }
 
@@ -372,7 +388,9 @@ public class CosmeticsFeatures implements Listener {
         Player player = event.getPlayer();
         ItemStack rod = player.getInventory().getItemInMainHand();
 
-        if (rod.hasItemMeta() && ChatColor.stripColor(rod.getItemMeta().getDisplayName()).equals("Grapple Hook")) {
+        String grappleHookName = ChatColor.stripColor(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gadgets.grapplehook-name", "Grapple Hook")));
+
+        if (rod.hasItemMeta() && ChatColor.stripColor(rod.getItemMeta().getDisplayName()).equals(grappleHookName)) {
             // Nur wenn der Hook auf dem Boden ist (IN_GROUND State)
             if (event.getState() == PlayerFishEvent.State.IN_GROUND) {
                 Location hookLoc = event.getHook().getLocation();
@@ -380,7 +398,8 @@ public class CosmeticsFeatures implements Listener {
                 // Zusätzliche Prüfung: Ist unter dem Hook ein solider Block?
                 Location blockBelow = hookLoc.clone().subtract(0, 1, 0);
                 if (!blockBelow.getBlock().getType().isSolid()) {
-                    player.sendMessage(translateColorCodes("&c&lGrapple Hook &7failed: Hook must be on solid ground!"));
+                    String message = plugin.getConfig().getString("messages.cosmetics.grapplehook-failed-ground", "&c&lGrapple Hook &7failed: Hook must be on solid ground!");
+                    player.sendMessage(translateColorCodes(plugin.getConfig().getString("prefix", "") + message));
                     return;
                 }
 
@@ -401,7 +420,7 @@ public class CosmeticsFeatures implements Listener {
                         // Prüfe ob der Spieler noch die Grapple Hook hält
                         ItemStack currentRod = player.getInventory().getItemInMainHand();
                         if (currentRod.hasItemMeta() &&
-                                ChatColor.stripColor(currentRod.getItemMeta().getDisplayName()).equals("Grapple Hook")) {
+                                ChatColor.stripColor(currentRod.getItemMeta().getDisplayName()).equals(grappleHookName)) {
 
                             // Simuliere das Einziehen der Angel
                             if (event.getHook() != null && !event.getHook().isDead()) {
@@ -414,7 +433,8 @@ public class CosmeticsFeatures implements Listener {
                 event.setCancelled(true);
             } else if (event.getState() == PlayerFishEvent.State.REEL_IN) {
                 // Verhindere normales Einziehen wenn Hook nicht auf dem Boden ist
-                player.sendMessage(translateColorCodes("&c&lGrapple Hook &7failed: Hook must land on solid ground first!"));
+                String message = plugin.getConfig().getString("messages.cosmetics.grapplehook-failed-land", "&c&lGrapple Hook &7failed: Hook must land on solid ground first!");
+                player.sendMessage(translateColorCodes(plugin.getConfig().getString("prefix", "") + message));
                 event.setCancelled(true);
             }
         }
@@ -433,15 +453,19 @@ public class CosmeticsFeatures implements Listener {
                 Player shooter = (Player) arrow.getShooter();
                 ItemStack bow = shooter.getInventory().getItemInMainHand();
 
-                if (bow.hasItemMeta() && ChatColor.stripColor(bow.getItemMeta().getDisplayName()).equals("Love Bow")) {
+                String loveBowName = ChatColor.stripColor(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gadgets.lovebow-name", "Love Bow")));
+
+                if (bow.hasItemMeta() && ChatColor.stripColor(bow.getItemMeta().getDisplayName()).equals(loveBowName)) {
                     event.setCancelled(true); // Kein Schaden
 
                     // Herz-Effekte
                     target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 2, 0), 10, 1, 1, 1, 0.1);
                     target.playSound(target.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 2.0f);
 
-                    // Nachricht
-                    target.sendMessage(translateColorCodes("&d&l♥ &fYou received love from &d" + shooter.getName() + "&f! &d&l♥"));
+                    // Konfigurierbare Love-Nachricht
+                    String message = plugin.getConfig().getString("messages.cosmetics.love-received", "&d&l♥ &fYou received love from &d%shooter%&f! &d&l♥");
+                    message = message.replace("%shooter%", shooter.getName());
+                    target.sendMessage(translateColorCodes(message));
 
                     // Pfeil entfernen
                     arrow.remove();
@@ -462,7 +486,9 @@ public class CosmeticsFeatures implements Listener {
                 Player shooter = (Player) arrow.getShooter();
                 ItemStack bow = shooter.getInventory().getItemInMainHand();
 
-                if (bow.hasItemMeta() && ChatColor.stripColor(bow.getItemMeta().getDisplayName()).equals("Love Bow")) {
+                String loveBowName = ChatColor.stripColor(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gadgets.lovebow-name", "Love Bow")));
+
+                if (bow.hasItemMeta() && ChatColor.stripColor(bow.getItemMeta().getDisplayName()).equals(loveBowName)) {
                     // Pfeil nach kurzer Zeit entfernen
                     new BukkitRunnable() {
                         @Override
@@ -512,9 +538,14 @@ public class CosmeticsFeatures implements Listener {
      */
     private String formatGadgetName(String type) {
         switch (type.toLowerCase()) {
-            case "grapplehook": return "Grapple Hook";
-            case "lovebow": return "Love Bow";
-            default: return type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase();
+            case "teleporter":
+                return ChatColor.stripColor(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gadgets.teleporter-name", "&5&lTeleporter")));
+            case "grapplehook":
+                return ChatColor.stripColor(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gadgets.grapplehook-name", "&2&lGrapple Hook")));
+            case "lovebow":
+                return ChatColor.stripColor(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gadgets.lovebow-name", "&d&lLove Bow")));
+            default:
+                return type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase();
         }
     }
 

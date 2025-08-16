@@ -40,11 +40,11 @@ public class CosmeticsManager {
 
         if (meta != null) {
             // Name mit Farbcode
-            meta.setDisplayName(translateColorCodes("&c&lCosmetics"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.cosmetics-item", "&c&lCosmetics &8&l| &7Rightclick")));
 
             // Lore hinzufügen
             meta.setLore(List.of(
-                    translateColorCodes("&7Right-click to open cosmetics!")
+                    translateColorCodes(plugin.getConfig().getString("messages.cosmetics.cosmetics-lore", ""))
             ));
 
             cosmetics.setItemMeta(meta);
@@ -67,8 +67,12 @@ public class CosmeticsManager {
             return false;
         }
 
-        String displayName = ChatColor.stripColor(meta.getDisplayName());
-        return displayName.equals("Cosmetics");
+        // Hole den erwarteten Namen aus der Config
+        String expectedName = translateColorCodes(plugin.getConfig().getString("messages.cosmetics.cosmetics-item", "&c&lCosmetics &8&l| &7Rightclick"));
+        String actualName = meta.getDisplayName();
+
+        // Vergleiche die Namen direkt (mit Farbcodes)
+        return expectedName.equals(actualName);
     }
 
     /**
