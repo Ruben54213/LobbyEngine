@@ -10,6 +10,7 @@ import net.Ruben54213.lobbyEngine.Listeners.NavigatorListener;
 import net.Ruben54213.lobbyEngine.Listeners.PlayerJoinListener;
 import net.Ruben54213.lobbyEngine.Utility.*;
 import net.Ruben54213.lobbyEngine.Listeners.PlayerQuitListener;
+import net.Ruben54213.lobbyEngine.Listeners.LobbyProtectionListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class LobbyEngine extends JavaPlugin {
@@ -113,6 +114,11 @@ public final class LobbyEngine extends JavaPlugin {
      */
     private void registerListeners() {
 
+        // LobbyProtection (Blockabbau, Schaden off, Void -> /spawn)
+        getServer().getPluginManager().registerEvents(new LobbyProtectionListener(this), this);
+
+
+
         // Build-Protection Listener
         BuildProtListener buildProtListener = new BuildProtListener(this);
         buildProtListener.register();
@@ -186,11 +192,22 @@ public final class LobbyEngine extends JavaPlugin {
             getLogger().warning("Command 'setspawn' not found in plugin.yml!");
         }
 
-        // Lobby Command
+        // LOBBY Command (für Navigator-Management) - DAS HAT GEFEHLT!
+        if (getCommand("lobby") != null) {
+            LobbyCommand lobbyCommand = new LobbyCommand(this, navigatorGUI);
+            getCommand("lobby").setExecutor(lobbyCommand);
+            getCommand("lobby").setTabCompleter(lobbyCommand);
+            getLogger().info("Lobby command registered successfully!");
+        } else {
+            getLogger().warning("Command 'lobby' not found in plugin.yml!");
+        }
+
+        // LOBBIES Command (für Lobby-Switching)
         if (getCommand("lobbies") != null) {
             LobbiesCommand lobbiesCommand = new LobbiesCommand(this, lobbyManager);
             getCommand("lobbies").setExecutor(lobbiesCommand);
             getCommand("lobbies").setTabCompleter(lobbiesCommand);
+            getLogger().info("Lobbies command registered successfully!");
         } else {
             getLogger().warning("Command 'lobbies' not found in plugin.yml!");
         }
@@ -254,5 +271,12 @@ public final class LobbyEngine extends JavaPlugin {
      */
     public LobbyManager getLobbyManager() {
         return lobbyManager;
+    }
+
+    /**
+     * Gibt den ServerNavigatorGUI zurück
+     */
+    public ServerNavigatorGUI getNavigatorGUI() {
+        return navigatorGUI;
     }
 }

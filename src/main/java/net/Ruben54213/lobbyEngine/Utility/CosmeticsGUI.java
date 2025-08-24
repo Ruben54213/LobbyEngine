@@ -12,10 +12,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionType;
 
 import java.util.List;
 
@@ -115,7 +112,7 @@ public class CosmeticsGUI implements Listener {
         gui.setItem(15, createGrappleHookItem(player));
 
         // Reset-Button hinzufügen
-        gui.setItem(13, createGadgetResetButton()); // Position geändert wegen Love Bow
+        gui.setItem(13, createGadgetResetButton()); // Position geändert da Slot 13 jetzt Love Bow ist
 
         // Zurück-Button
         gui.setItem(22, createBackButton());
@@ -362,7 +359,7 @@ public class CosmeticsGUI implements Listener {
         ItemStack item = new ItemStack(Material.ENDER_EYE);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(translateColorCodes("&5&lTeleporter"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gadgets.teleporter-name", "&5&lTeleporter")));
             boolean hasPermission = player.hasPermission("lobbyengine.cosmetics.gadgets.teleporter");
             meta.setLore(hasPermission ?
                     List.of(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.unlocked", ""))) :
@@ -377,7 +374,7 @@ public class CosmeticsGUI implements Listener {
         ItemStack item = new ItemStack(Material.FISHING_ROD);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(translateColorCodes("&2&lGrapple Hook"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gadgets.grapplehook-name", "&2&lEnterhaken")));
             boolean hasPermission = player.hasPermission("lobbyengine.cosmetics.gadgets.grapplehook");
             meta.setLore(hasPermission ?
                     List.of(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.unlocked", ""))) :
@@ -392,7 +389,7 @@ public class CosmeticsGUI implements Listener {
         ItemStack item = new ItemStack(Material.BOW);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(translateColorCodes("&d&lLove Bow"));
+            meta.setDisplayName(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gadgets.lovebow-name", "&d&lLiebesbogen")));
             boolean hasPermission = player.hasPermission("lobbyengine.cosmetics.gadgets.lovebow");
             meta.setLore(hasPermission ?
                     List.of(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.unlocked", ""))) :
@@ -526,178 +523,161 @@ public class CosmeticsGUI implements Listener {
     private void handleItemActivation(Player player, String guiTitle, ItemStack clickedItem, int slot) {
         if (!clickedItem.hasItemMeta()) return;
 
-        String displayName = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName());
+        String displayName = clickedItem.getItemMeta().getDisplayName();
 
         // Reset-Buttons behandeln
-        if (displayName.equals(ChatColor.stripColor(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.remove-buttons.reset", ""))))) {
+        String resetName = translateColorCodes(plugin.getConfig().getString("messages.cosmetics.remove-buttons.reset", ""));
+        if (displayName.equals(resetName)) {
             String particlesTitle = translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.particles", ""));
             String effectsTitle = translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.effects", ""));
             String gadgetsTitle = translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.gadgets", ""));
 
             if (guiTitle.equals(particlesTitle)) {
                 cosmeticsFeatures.stopParticles(player);
-                player.sendMessage(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.particles-disabled", "")));
+                player.sendMessage(translateColorCodes(plugin.getConfig().getString("prefix", "") + plugin.getConfig().getString("messages.cosmetics.particles-disabled", "")));
                 player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
             } else if (guiTitle.equals(effectsTitle)) {
                 cosmeticsFeatures.stopEffects(player);
-                player.sendMessage(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.effects-disabled", "")));
+                player.sendMessage(translateColorCodes(plugin.getConfig().getString("prefix", "") + plugin.getConfig().getString("messages.cosmetics.effects-disabled", "")));
                 player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
             } else if (guiTitle.equals(gadgetsTitle)) {
                 cosmeticsFeatures.removeGadget(player);
-                player.sendMessage(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.gadget-removed", "")));
+                player.sendMessage(translateColorCodes(plugin.getConfig().getString("prefix", "") + plugin.getConfig().getString("messages.cosmetics.gadget-removed", "")));
                 player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
             }
             return;
         }
 
-        // Permission Check erst
-        String permissionNeeded = getRequiredPermission(displayName);
-        if (permissionNeeded != null && !player.hasPermission(permissionNeeded)) {
-            player.sendMessage(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.locked-message", "")));
-            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
-            return;
-        }
-
-        // Feature aktivieren basierend auf GUI-Typ
+        // Feature aktivieren basierend auf Item-Typ durch Slot-Position
         String particlesTitle = translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.particles", ""));
         String effectsTitle = translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.effects", ""));
         String gadgetsTitle = translateColorCodes(plugin.getConfig().getString("shortprefix", "") + plugin.getConfig().getString("messages.cosmetics.gui.gadgets", ""));
 
         if (guiTitle.equals(particlesTitle)) {
-            activateParticle(player, displayName);
+            handleParticleActivation(player, slot);
         } else if (guiTitle.equals(effectsTitle)) {
-            activateEffect(player, displayName);
+            handleEffectActivation(player, slot);
         } else if (guiTitle.equals(gadgetsTitle)) {
-            giveGadget(player, displayName);
+            handleGadgetActivation(player, slot);
         }
     }
 
     /**
-     * Aktiviert Partikel-Effekte
+     * Behandelt Partikel-Aktivierung basierend auf Slot
      */
-    private void activateParticle(Player player, String particleName) {
-        String particleType = getParticleType(particleName);
-        if (particleType != null) {
-            cosmeticsFeatures.activateParticles(player, particleType);
-            player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
+    private void handleParticleActivation(Player player, int slot) {
+        String particleType = null;
+        String permission = null;
+
+        switch (slot) {
+            case 10: // Heart
+                particleType = "heart";
+                permission = "lobbyengine.cosmetics.particles.heart";
+                break;
+            case 11: // Ender
+                particleType = "ender";
+                permission = "lobbyengine.cosmetics.particles.ender";
+                break;
+            case 12: // Lava
+                particleType = "lava";
+                permission = "lobbyengine.cosmetics.particles.lava";
+                break;
+            case 14: // Water
+                particleType = "water";
+                permission = "lobbyengine.cosmetics.particles.water";
+                break;
+            case 15: // Fire
+                particleType = "fire";
+                permission = "lobbyengine.cosmetics.particles.fire";
+                break;
+            case 16: // Rain Cloud
+                particleType = "raincloud";
+                permission = "lobbyengine.cosmetics.particles.raincloud";
+                break;
+        }
+
+        if (particleType != null && permission != null) {
+            if (player.hasPermission(permission)) {
+                cosmeticsFeatures.activateParticles(player, particleType);
+                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
+            } else {
+                player.sendMessage(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.locked-message", "")));
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+            }
         }
     }
 
     /**
-     * Aktiviert Effekte
+     * Behandelt Effekt-Aktivierung basierend auf Slot
      */
-    private void activateEffect(Player player, String effectName) {
-        String effectType = getEffectType(effectName);
-        if (effectType != null) {
-            cosmeticsFeatures.activateEffect(player, effectType);
-            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+    private void handleEffectActivation(Player player, int slot) {
+        String effectType = null;
+        String permission = null;
+
+        switch (slot) {
+            case 10: // Fly
+                effectType = "fly";
+                permission = "lobbyengine.cosmetics.effects.fly";
+                break;
+            case 11: // Double Jump
+                effectType = "doublejump";
+                permission = "lobbyengine.cosmetics.effects.doublejump";
+                break;
+            case 12: // Jump Boost
+                effectType = "jumpboost";
+                permission = "lobbyengine.cosmetics.effects.jumpboost";
+                break;
+            case 14: // Night Vision
+                effectType = "nightvision";
+                permission = "lobbyengine.cosmetics.effects.nightvision";
+                break;
+            case 15: // Speed
+                effectType = "speed";
+                permission = "lobbyengine.cosmetics.effects.speed";
+                break;
+        }
+
+        if (effectType != null && permission != null) {
+            if (player.hasPermission(permission)) {
+                cosmeticsFeatures.activateEffect(player, effectType);
+                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+            } else {
+                player.sendMessage(translateColorCodes(plugin.getConfig().getString("messages.cosmetics.locked-message", "")));
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+            }
         }
     }
 
     /**
-     * Gibt Gadgets
+     * Behandelt Gadget-Aktivierung basierend auf Slot
      */
-    private void giveGadget(Player player, String gadgetName) {
-        String gadgetType = getGadgetType(gadgetName);
-        if (gadgetType != null) {
-            cosmeticsFeatures.giveGadget(player, gadgetType);
-            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0f, 1.0f);
-        }
-    }
+    private void handleGadgetActivation(Player player, int slot) {
+        String gadgetType = null;
+        String permission = null;
 
-    /**
-     * Ermittelt benötigte Permission
-     */
-    private String getRequiredPermission(String displayName) {
-        switch (displayName) {
-            case "Heart Particles":
-                return "lobbyengine.cosmetics.particles.heart";
-            case "Ender Particles":
-                return "lobbyengine.cosmetics.particles.ender";
-            case "Lava Particles":
-                return "lobbyengine.cosmetics.particles.lava";
-            case "Water Particles":
-                return "lobbyengine.cosmetics.particles.water";
-            case "Fire Particles":
-                return "lobbyengine.cosmetics.particles.fire";
-            case "Rain Cloud":
-                return "lobbyengine.cosmetics.particles.raincloud";
-            case "Fly":
-                return "lobbyengine.cosmetics.effects.fly";
-            case "Double Jump":
-                return "lobbyengine.cosmetics.effects.doublejump";
-            case "Jump Boost":
-                return "lobbyengine.cosmetics.effects.jumpboost";
-            case "Night Vision":
-                return "lobbyengine.cosmetics.effects.nightvision";
-            case "Speed":
-                return "lobbyengine.cosmetics.effects.speed";
-            case "Teleporter":
-                return "lobbyengine.cosmetics.gadgets.teleporter";
-            case "Grapple Hook":
-                return "lobbyengine.cosmetics.gadgets.grapplehook";
-            case "Love Bow":
-                return "lobbyengine.cosmetics.gadgets.lovebow";
-            default:
-                return null;
+        switch (slot) {
+            case 11: // Teleporter
+                gadgetType = "teleporter";
+                permission = "lobbyengine.cosmetics.gadgets.teleporter";
+                break;
+            case 13: // Love Bow
+                gadgetType = "lovebow";
+                permission = "lobbyengine.cosmetics.gadgets.lovebow";
+                break;
+            case 15: // Grapple Hook
+                gadgetType = "grapplehook";
+                permission = "lobbyengine.cosmetics.gadgets.grapplehook";
+                break;
         }
-    }
 
-    /**
-     * Konvertiert Display-Namen zu internen Partikel-Types
-     */
-    private String getParticleType(String displayName) {
-        switch (displayName) {
-            case "Heart Particles":
-                return "heart";
-            case "Ender Particles":
-                return "ender";
-            case "Lava Particles":
-                return "lava";
-            case "Water Particles":
-                return "water";
-            case "Fire Particles":
-                return "fire";
-            case "Rain Cloud":
-                return "raincloud";
-            default:
-                return null;
-        }
-    }
-
-    /**
-     * Konvertiert Display-Namen zu internen Effekt-Types
-     */
-    private String getEffectType(String displayName) {
-        switch (displayName) {
-            case "Fly":
-                return "fly";
-            case "Double Jump":
-                return "doublejump";
-            case "Jump Boost":
-                return "jumpboost";
-            case "Night Vision":
-                return "nightvision";
-            case "Speed":
-                return "speed";
-            default:
-                return null;
-        }
-    }
-
-    /**
-     * Konvertiert Display-Namen zu internen Gadget-Types
-     */
-    private String getGadgetType(String displayName) {
-        switch (displayName) {
-            case "Teleporter":
-                return "teleporter";
-            case "Grapple Hook":
-                return "grapplehook";
-            case "Love Bow":
-                return "lovebow";
-            default:
-                return null;
+        if (gadgetType != null && permission != null) {
+            if (player.hasPermission(permission)) {
+                cosmeticsFeatures.giveGadget(player, gadgetType);
+                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0f, 1.0f);
+            } else {
+                player.sendMessage(translateColorCodes(plugin.getConfig().getString("prefix", "") + plugin.getConfig().getString("messages.cosmetics.locked-message", "")));
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+            }
         }
     }
 

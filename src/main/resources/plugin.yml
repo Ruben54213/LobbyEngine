@@ -4,6 +4,7 @@ main: net.Ruben54213.lobbyEngine.LobbyEngine
 api-version: '1.18'
 authors: [Ruben54213]
 description: A comprehensive lobby system for Minecraft servers
+
 commands:
   entityspawn:
     description: Toggle entity spawning in the lobby
@@ -28,11 +29,14 @@ commands:
     usage: /lobby <create|remove|list|reload>
     permission: lobbyengine.lobby
     permission-message: "&cYou don't have permission to use this command!"
+    aliases: [nav, navigator]
 
   lobbies:
-    description: Manage lobbies
+    description: Manage lobby switching system
     usage: /lobbies <create|remove|list|gui|reload>
     permission: lobbyengine.lobbies
+    permission-message: "&cYou don't have permission to use this command!"
+    aliases: [lobbyswitch, ls]
 
 permissions:
   lobbyengine.*:
@@ -44,6 +48,8 @@ permissions:
       lobbyengine.spawn: true
       lobbyengine.setspawn: true
       lobbyengine.lobby: true
+      lobbyengine.lobbies: true
+      lobbyengine.lobbies.reload: true
 
   lobbyengine.build:
     description: Allows building in creative mode
@@ -63,4 +69,12 @@ permissions:
 
   lobbyengine.lobby:
     description: Allows managing the server navigator
+    default: op
+
+  lobbyengine.lobbies:
+    description: Allows managing lobby switching
+    default: op
+
+  lobbyengine.lobbies.reload:
+    description: Allows reloading lobby configuration
     default: op

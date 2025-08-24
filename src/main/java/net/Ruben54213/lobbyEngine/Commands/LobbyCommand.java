@@ -7,7 +7,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -56,6 +55,8 @@ public class LobbyCommand implements CommandExecutor, TabCompleter {
                 return handleListCommand(sender);
             case "reload":
                 return handleReloadCommand(sender);
+            case "help":
+                return sendHelpMessage(sender);
             default:
                 sendHelpMessage(sender);
                 return true;
@@ -244,13 +245,16 @@ public class LobbyCommand implements CommandExecutor, TabCompleter {
 
     /**
      * Sendet Hilfe-Nachricht
+     *
+     * @return
      */
-    private void sendHelpMessage(CommandSender sender) {
+    private boolean sendHelpMessage(CommandSender sender) {
         sender.sendMessage(translateColorCodes("&d&lLobbyEngine Navigator Commands:"));
         sender.sendMessage(translateColorCodes("&7/lobby create <server> <slot> <name> <material> &8- Create server"));
         sender.sendMessage(translateColorCodes("&7/lobby remove <slot> &8- Remove server"));
         sender.sendMessage(translateColorCodes("&7/lobby list &8- List all servers"));
         sender.sendMessage(translateColorCodes("&7/lobby reload &8- Reload configuration"));
+        return false;
     }
 
     @Override

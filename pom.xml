@@ -6,7 +6,7 @@
 
     <groupId>net.Ruben54213</groupId>
     <artifactId>LobbyEngine</artifactId>
-    <version>1.0-ALPHA</version>
+    <version>1.0-BETA</version>
     <packaging>jar</packaging>
 
     <name>LobbyEngine</name>
