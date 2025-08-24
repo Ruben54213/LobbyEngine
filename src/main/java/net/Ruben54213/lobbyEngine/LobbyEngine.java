@@ -118,6 +118,8 @@ public final class LobbyEngine extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new LobbyProtectionListener(this), this);
 
 
+        // Chat Listener
+        getServer().getPluginManager().registerEvents(new ChatListener(), this);
 
         // Build-Protection Listener
         BuildProtListener buildProtListener = new BuildProtListener(this);
